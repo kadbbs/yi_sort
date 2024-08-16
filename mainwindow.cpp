@@ -8,6 +8,22 @@
 #include <cmath>
 #include <QFileInfo>
 
+Point calculateCentroid(const std::vector<Point>& points) {
+    double sumX = 0.0, sumY = 0.0;
+    int n = points.size();
+
+    for (const auto& point : points) {
+        sumX += point.x;
+        sumY += point.y;
+    }
+
+    Point centroid;
+    centroid.x = sumX / n;
+    centroid.y = sumY / n;
+
+    return centroid;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -98,6 +114,9 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
     qDebug()<<"displayPoints"<<"\n";
 
     displayPoints(points);
+    //画出中心
+    scene->addEllipse(centre.x, -centre.y, 1, 1, QPen(Qt::red), QBrush(Qt::red));
+
 #if 0
 
     if (filesPoints.find(filePath) != filesPoints.end()) {
@@ -183,10 +202,43 @@ std::vector<Point> MainWindow::sortPoints(std::vector<Point> &points)
         return a.x < b.x;
     });
 
+    Point frontEdge = *std::min_element(points.begin(), points.end(), [](const Point &a, const Point &b) {
+        return a.x > b.x;
+    });
+
+//    centre.x=(rearEdge.x+frontEdge.x)/2;
+//    centre.y=(rearEdge.y+frontEdge.y)/2;
+    centre = calculateCentroid(points);
+
+
+#if 0
+    //构造待聚类数据集
+    std::vector< std::vector<double> > data;
+    for (int i = 0; i < points.size(); i++)
+    {
+        data.push_back(points[i]);
+    }
+
+    //构建聚类算法
+    KMEANS<double> kmeans;
+    //数据加载入算法
+    kmeans.loadData(data);
+    //运行k均值聚类算法
+    kmeans.kmeans(1);
+
+
+
+#endif
+
+    Point centre_;
+    centre_.x=centre.x;
+    centre_.y=centre.y;
+
+
     // 按角度排序，从后缘点顺时针
-    std::sort(points.begin(), points.end(), [&rearEdge](const Point &a, const Point &b) {
-        double angleA = atan2(a.y - rearEdge.y, a.x - rearEdge.x);
-        double angleB = atan2(b.y - rearEdge.y, b.x - rearEdge.x);
+    std::sort(points.begin(), points.end(), [centre_](const Point &a, const Point &b) {
+        double angleA = atan2(a.y - centre_.y, a.x - centre_.x);
+        double angleB = atan2(b.y - centre_.y, b.x - centre_.x);
         return angleA < angleB;
     });
 
@@ -203,13 +255,36 @@ void MainWindow::displayPoints(const std::vector<Point> &points)
         // 连接点以形成翼型轮廓
         if (points.size() > 1) {
             for (size_t i = 0; i < points.size() - 1; ++i) {
-                scene->addLine(points[i].x, -points[i].y, points[i+1].x, -points[i+1].y, QPen(Qt::blue));
+                scene->addLine(points[i].x, -points[i].y, points[i+1].x, -points[i+1].y, QPen(Qt::blue,0.5));
             }
             // 最后一个点与第一个点相连
-            scene->addLine(points.back().x, -points.back().y, points.front().x, -points.front().y, QPen(Qt::blue));
+            scene->addLine(points.back().x, -points.back().y, points.front().x, -points.front().y, QPen(Qt::blue,0.5));
         }
 
         ui->graphicsView->fitInView(scene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
+
+
+//Point findo(std::vector<Point> &points){
+//    for(int i=0;i<points.size();i++){
+//        for(int j=i+1;j<points.size();j++){
+//            double d=sqrt(pow((points[i].x-points[j].x),2)+pow((points[i].y-points[j].y),2));
+//            // ptopd_map[std::make_pair(points[i],points[j])]=sqrt(pow((points[i].x-points[j].x),2)+pow((points[i].y-points[j].y),2));
+//            ptopd_map[d]=std::make_pair(points[i],points[j]);
+//            ptopd.push_back(d);
+//        }
+//    }
+
+//    sort(ptopd.begin(),ptopd.end(),[](double a,double b){
+//        return a>b;
+//    });
+
+//    point p;
+//    p.x=(ptopd_map[ptopd[0]].first.x+ptopd_map[ptopd[0]].second.x)/2;
+//    p.y=(ptopd_map[ptopd[0]].first.y+ptopd_map[ptopd[0]].second.y)/2;
+
+
+//    return p;
+//}
 
 

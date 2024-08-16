@@ -1,5 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "ykmeans.h"
 
 #include <QMainWindow>
 
@@ -39,6 +40,8 @@ private:
 
         QString rootfilepath;
         QString crrentfilepath;
+        Point centre;
+
 
         std::vector<Point> importPoints(const QString &filePath);
         void exportPoints();
