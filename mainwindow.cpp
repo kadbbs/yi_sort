@@ -93,6 +93,13 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
 
     qDebug()<<"filePath: "<<filePath<<"\n";
 
+    points = importPoints(filePath);  // 导入点
+
+    qDebug()<<"displayPoints"<<"\n";
+
+    displayPoints(points);
+#if 0
+
     if (filesPoints.find(filePath) != filesPoints.end()) {
         points = filesPoints[filePath];
         points = importPoints(filePath);  // 导入点
@@ -101,6 +108,7 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
 
         displayPoints(points);
     }
+#endif
     qDebug()<<"on_listWidget_itemClicked"<<"\n";
 }
 
