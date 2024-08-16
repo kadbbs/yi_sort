@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "ykmeans.h"
+//#include "ykmeans.h"
 
 #include <QMainWindow>
 

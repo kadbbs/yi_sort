@@ -30,8 +30,7 @@ SOURCES += \
         mainwindow.cpp
 
 HEADERS += \
-        mainwindow.h \
-    ykmeans.h
+        mainwindow.h
 
 FORMS += \
         mainwindow.ui
